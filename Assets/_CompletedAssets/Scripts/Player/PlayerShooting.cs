@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnitySampleAssets.CrossPlatformInput;
+using System.Collections.Generic;
+using Valve.VR;
 
 namespace CompleteProject
 {
@@ -8,7 +10,6 @@ namespace CompleteProject
         public int damagePerShot = 20;                  // The damage inflicted by each bullet.
         public float timeBetweenBullets = 0.15f;        // The time between each shot.
         public float range = 100f;                      // The distance the gun can fire.
-
 
         float timer;                                    // A timer to determine when to fire.
         Ray shootRay;                                   // A ray from the gun end forwards.
@@ -35,7 +36,6 @@ namespace CompleteProject
 			//faceLight = GetComponentInChildren<Light> ();
         }
 
-
         void Update ()
         {
             // Add the time since Update was last called to the timer.
@@ -43,7 +43,8 @@ namespace CompleteProject
 
 #if !MOBILE_INPUT
             // If the Fire1 button is being press and it's time to fire...
-			if(Input.GetButton ("Fire1") && timer >= timeBetweenBullets && Time.timeScale != 0)
+			// if(Input.GetButton ("Fire1") && timer >= timeBetweenBullets && Time.timeScale != 0)
+			if(SteamVR_Controller.Input(2).GetTouchDown(EVRButtonId.k_EButton_SteamVR_Trigger) && timer >= timeBetweenBullets && Time.timeScale != 0)
             {
                 // ... shoot the gun.
                 Shoot ();
@@ -73,7 +74,6 @@ namespace CompleteProject
             gunLight.enabled = false;
         }
 
-
         void Shoot ()
         {
             // Reset the timer.
@@ -90,13 +90,15 @@ namespace CompleteProject
             gunParticles.Stop ();
             gunParticles.Play ();
 
+			var t = SteamVR_Controller.Input(2).transform;
+
             // Enable the line renderer and set it's first position to be the end of the gun.
             gunLine.enabled = true;
-            gunLine.SetPosition (0, transform.position);
+			gunLine.SetPosition (0, t.pos);
 
             // Set the shootRay so that it starts at the end of the gun and points forward from the barrel.
-            shootRay.origin = transform.position;
-            shootRay.direction = transform.forward;
+			shootRay.origin = t.pos;
+			shootRay.direction = t.rot * Vector3.forward;
 
             // Perform the raycast against gameobjects on the shootable layer and if it hits something...
             if(Physics.Raycast (shootRay, out shootHit, range, shootableMask))

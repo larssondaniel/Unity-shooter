@@ -6,14 +6,15 @@ namespace CompleteProject
     {
         public PlayerHealth playerHealth;       // Reference to the player's heatlh.
         public GameObject enemy;                // The enemy prefab to be spawned.
-        public float spawnTime = 3f;            // How long between each spawn.
+        public float spawnTime = 3f;            // Time between each spawn.
+		public float spawnDelay = 5f;           // Delay before first spawn.
         public Transform[] spawnPoints;         // An array of the spawn points this enemy can spawn from.
 
 
         void Start ()
         {
             // Call the Spawn function after a delay of the spawnTime and then continue to call after the same amount of time.
-            InvokeRepeating ("Spawn", spawnTime, spawnTime);
+			InvokeRepeating ("Spawn", spawnDelay, spawnTime);
         }
 
 
